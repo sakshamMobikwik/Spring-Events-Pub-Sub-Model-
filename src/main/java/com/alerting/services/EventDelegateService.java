@@ -12,21 +12,22 @@ import java.lang.reflect.Method;
 public class EventDelegateService {
 
     public <T> void delegateToProcessor(Class c, T event) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
-        System.out.println("Inside processor delegation process");
+//        System.out.println("Inside processor delegation process");
         Method method = c.getDeclaredMethod("consume", Object.class);
         Method chala = null;
         if (method.isAnnotationPresent(EventDelegation.class)) {
             EventDelegation eventDelegation = method.getAnnotation(EventDelegation.class);
             Class targetProcessor = eventDelegation.targetProcessor();
+//            System.out.println("Getting Class as : "+targetProcessor.getName());
             String targetMethod = eventDelegation.targetMethod();
             chala = c.getDeclaredMethod(targetMethod);
             chala.setAccessible(true);
-            chala.invoke(c.newInstance());
+//            chala.invoke(c.newInstance());
             Object obj = targetProcessor.newInstance();
             EventWrapper eventWrapper = (EventWrapper) event;
             System.out.println(targetProcessor);
             Method targetProcessorMethod = obj.getClass().getMethod("handleEvent", eventWrapper.getClass());
-            targetProcessorMethod.invoke(obj,eventWrapper);
+            targetProcessorMethod.invoke(obj,new Object[]{eventWrapper});
        }
     }
 }
